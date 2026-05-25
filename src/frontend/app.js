@@ -68,6 +68,7 @@ function setStage(stage) {
   etaText.textContent = meta.eta;
   bufferText.textContent = meta.buffer;
   statusCard.dataset.theme = meta.theme;
+  document.body.dataset.stage = meta.theme;
 }
 
 tabs.forEach((tab) => {
