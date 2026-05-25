@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Run! 出行救急</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="phone-shell" aria-label="Run 出行救急移动端概念页">
+      <section class="hero">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">OTA 订单救急插件</p>
+            <h1>Run!</h1>
+          </div>
+          <button class="icon-button" type="button" aria-label="打开实验室" data-open-lab>
+            <span aria-hidden="true">LAB</span>
+          </button>
+        </div>
+
+        <div class="status-card" id="statusCard">
+          <div>
+            <p class="status-label" id="statusLabel">当前可正常赶上</p>
+            <strong id="statusTitle">建议 17:05 前出发</strong>
+          </div>
+          <span class="status-pill" id="statusPill">安全余量 18 分钟</span>
+        </div>
+
+        <div class="route-strip" aria-label="原订单路线">
+          <div class="route-node active">
+            <span></span>
+            中关村学院
+          </div>
+          <div class="route-line"></div>
+          <div class="route-node">
+            <span></span>
+            北京西
+          </div>
+          <div class="route-line"></div>
+          <div class="route-node">
+            <span></span>
+            西安北
+          </div>
+        </div>
+      </section>
+
+      <section class="content">
+        <article class="order-card">
+          <div class="section-title">
+            <p>已购订单</p>
+            <span>12306 / OTA 导入</span>
+          </div>
+          <div class="train-row">
+            <div>
+              <strong>G673</strong>
+              <p>北京西 18:06 → 西安北 23:11</p>
+            </div>
+            <span>二等座</span>
+          </div>
+          <div class="metrics">
+            <div>
+              <small>当前位置</small>
+              <strong>中关村学院</strong>
+            </div>
+            <div>
+              <small>到站 ETA</small>
+              <strong id="etaText">43 分钟</strong>
+            </div>
+            <div>
+              <small>进站缓冲</small>
+              <strong id="bufferText">15 分钟</strong>
+            </div>
+          </div>
+        </article>
+
+        <nav class="scenario-tabs" aria-label="Demo 状态切换">
+          <button type="button" class="active" data-stage="safe">订单</button>
+          <button type="button" data-stage="first">提醒</button>
+          <button type="button" data-stage="failed">救急</button>
+          <button type="button" data-stage="action">行动卡</button>
+        </nav>
+
+        <section class="panel active" id="safePanel">
+          <div class="notice good">
+            <p>Run! 监测到当前仍可赶上原车。</p>
+            <strong>现在出发，预计 17:48 抵达北京西，留有 18 分钟安全余量。</strong>
+          </div>
+          <button class="primary-action" type="button" data-stage-button="first">
+            模拟第一次提醒
+          </button>
+        </section>
+
+        <section class="panel" id="firstPanel">
+          <div class="modal-card">
+            <p class="eyebrow">第一次提醒</p>
+            <h2>现在走，还来得及</h2>
+            <div class="decision-grid">
+              <div>
+                <small>路上 ETA</small>
+                <strong>43 分钟</strong>
+              </div>
+              <div>
+                <small>安检进站</small>
+                <strong>15 分钟</strong>
+              </div>
+              <div>
+                <small>安全余量</small>
+                <strong>18 分钟</strong>
+              </div>
+            </div>
+            <div class="button-stack">
+              <button class="primary-action" type="button">立即出发</button>
+              <button class="secondary-action" type="button">稍后提醒</button>
+              <button class="secondary-action danger-text" type="button" data-stage-button="failed">
+                忽略 35 分钟
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="failedPanel">
+          <div class="notice danger">
+            <p>原站方案已失效</p>
+            <strong>继续去北京西的赶上概率低于 20%，不建议再无效冲刺。</strong>
+          </div>
+          <div class="search-box">
+            <div class="scan-line"></div>
+            <p>正在搜索下游站拦截、补救高铁、改签与航空兜底方案</p>
+            <div class="search-stats">
+              <span>候选 27</span>
+              <span>过滤 23</span>
+              <span>保留 4</span>
+            </div>
+          </div>
+          <ul class="filter-list">
+            <li><span></span>8 条无余票</li>
+            <li><span></span>6 条赶不上发车站</li>
+            <li><span></span>5 条到达晚于原车</li>
+            <li><span></span>4 条异站换乘不足</li>
+          </ul>
+          <button class="primary-action" type="button" data-stage-button="action">
+            查看最小损失方案
+          </button>
+        </section>
+
+        <section class="panel" id="actionPanel">
+          <article class="action-card">
+            <div class="section-title">
+              <p>推荐方案</p>
+              <span>下游站拦截原车</span>
+            </div>
+            <h2>别去北京西，先去石家庄</h2>
+            <p class="action-copy">
+              立即购买 G7812 北京丰台 → 石家庄，20:06 到达后站内换乘，接回原 G673。
+            </p>
+            <div class="timeline">
+              <div>
+                <span>17:42</span>
+                <p>叫车去北京丰台</p>
+              </div>
+              <div>
+                <span>18:36</span>
+                <p>乘 G7812 到石家庄</p>
+              </div>
+              <div>
+                <span>20:24</span>
+                <p>接回原车 G673</p>
+              </div>
+            </div>
+            <div class="metrics compact">
+              <div>
+                <small>新增成本</small>
+                <strong>¥128</strong>
+              </div>
+              <div>
+                <small>保住原票</small>
+                <strong>¥515</strong>
+              </div>
+              <div>
+                <small>成功概率</small>
+                <strong>78%</strong>
+              </div>
+            </div>
+            <div class="threshold">
+              <span>失败阈值</span>
+              <p>18:03 前未上车，自动重算 Plan B。</p>
+            </div>
+            <div class="button-grid">
+              <button class="primary-action" type="button">一键购票 Mock</button>
+              <button class="secondary-action" type="button">一键叫车 Mock</button>
+              <button class="secondary-action" type="button">复制给同行人</button>
+              <button class="secondary-action" type="button">查看 Plan B</button>
+            </div>
+          </article>
+        </section>
+
+        <section class="demo-console" aria-label="演示异常控制台">
+          <div class="section-title">
+            <p>异常控制台</p>
+            <span>演示重算触发器</span>
+          </div>
+          <div class="console-grid">
+            <button type="button" data-console="eta">打车 ETA +8 分钟</button>
+            <button type="button" data-console="queue">进站排队 +10 分钟</button>
+            <button type="button" data-console="ticket">补救车余票消失</button>
+            <button type="button" data-console="delay">原车晚点 12 分钟</button>
+          </div>
+          <p id="consoleResult">点击任一异常，页面会模拟触发一次救急重算。</p>
+        </section>
+      </section>
+
+      <aside class="lab-drawer" id="labDrawer" aria-hidden="true">
+        <div class="drawer-panel">
+          <button class="icon-button close-button" type="button" aria-label="关闭实验室" data-close-lab>
+            <span aria-hidden="true">×</span>
+          </button>
+          <p class="eyebrow">实验室</p>
+          <h2>自定义车次救急 Beta</h2>
+          <p>
+            输入车次、上车站和当前位置，Run! 会基于本地时刻表快照、模拟余票和局部城市动线生成救急建议。
+          </p>
+          <label>
+            车次
+            <input value="G673" />
+          </label>
+          <label>
+            原上车站
+            <input value="北京西" />
+          </label>
+          <label>
+            当前地点
+            <input value="中关村学院" />
+          </label>
+          <button class="primary-action" type="button">生成 Beta 建议</button>
+          <small>
+            Beta 仅供 Demo 演示；严肃判断由规则引擎完成，AI 负责解析输入和生成行动卡说明。
+          </small>
+        </div>
+      </aside>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
