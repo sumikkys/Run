@@ -7,6 +7,37 @@ Run! 的核心能力是：读取或输入用户订单，结合全国铁路时刻
 
 ---
 
+## 寻路算法 Demo V0
+
+已加入一版可运行的北京出发误车救急 demo，重点验证“原站赶不上后，下游站拦截原车”的规则引擎闭环。
+
+详见：[docs/pathfinding_demo.md](docs/pathfinding_demo.md)
+
+快速启动：
+
+```powershell
+$env:AMAP_API_KEY="..."
+$env:DEEPSEEK_API_KEY="..."
+python -m src.backend.extract_manual_transfers
+python -m src.backend.demo_server --host 127.0.0.1 --port 8765
+```
+
+打开：
+
+```text
+http://127.0.0.1:8765/
+```
+
+当前实现：
+
+- 高德 API 优先计算城市 ETA，失败时使用 mock fallback。
+- 人工换乘/进站标注优先用于缓冲时间和行动建议。
+- 铁路时刻表负责原车经停和补救车搜索。
+- 规则引擎负责是否可赶上、下游拦截、过滤原因和排序。
+- DeepSeek 只生成行动卡文案，不参与严肃路线判断。
+
+---
+
 ## B. Proposal 摘要
 
 ### B.1 项目名称

@@ -47,6 +47,8 @@ env/
 *.db
 tmp/
 temp/
+data/demo_server.out
+data/demo_server.err
 
 # OS thumbnails
 Thumbs.db
