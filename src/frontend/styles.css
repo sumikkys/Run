@@ -24,6 +24,7 @@
 }
 
 body {
+  overflow: hidden;
   min-height: 100vh;
   margin: 0;
   background:
@@ -59,14 +60,24 @@ button {
   cursor: pointer;
 }
 
+.demo-stage {
+  width: 100%;
+}
+
 .phone-shell {
   position: relative;
   width: min(100%, 430px);
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 0;
   margin: 0 auto;
-  overflow: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: var(--paper);
   box-shadow: var(--shadow);
+}
+
+.presenter-rail {
+  display: none;
 }
 
 .hero {
@@ -342,7 +353,7 @@ h2 {
 
 .scenario-tabs {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 1fr;
   gap: 6px;
   padding: 5px;
   border: 1px solid var(--line);
@@ -722,9 +733,71 @@ h2 {
     padding: 28px;
   }
 
+  .demo-stage {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 18px;
+    width: min(100%, 724px);
+  }
+
   .phone-shell {
-    min-height: 860px;
+    flex: 1 1 430px;
+    min-width: 0;
+    max-width: 430px;
+    height: min(860px, calc(100vh - 56px));
+    min-height: 0;
+    margin: 0;
     border-radius: 28px;
+  }
+
+  .presenter-rail {
+    position: sticky;
+    top: 28px;
+    display: grid;
+    flex: 0 0 250px;
+    gap: 14px;
+  }
+
+  .presenter-card,
+  .presenter-rail .demo-console {
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: 0 18px 48px rgba(22, 34, 31, 0.14);
+    backdrop-filter: blur(16px);
+  }
+
+  .presenter-card {
+    padding: 14px;
+  }
+
+  .presenter-rail .scenario-tabs {
+    grid-template-columns: 1fr;
+    margin: 0;
+    border-color: rgba(22, 34, 31, 0.12);
+    background: rgba(237, 243, 239, 0.78);
+  }
+
+  .presenter-rail .scenario-tabs button {
+    min-height: 44px;
+    text-align: left;
+    padding: 0 12px;
+  }
+
+  .presenter-rail .demo-console {
+    padding: 14px;
+    margin: 0;
+  }
+
+  .presenter-rail .console-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 699px) {
+  .presenter-rail {
+    display: none;
   }
 }
 

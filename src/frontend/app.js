@@ -1,5 +1,6 @@
 const stageMeta = {
   safe: {
+    brand: "OK!",
     label: "当前可正常赶上",
     title: "建议 17:05 前出发",
     pill: "安全余量 18 分钟",
@@ -8,6 +9,7 @@ const stageMeta = {
     theme: "safe",
   },
   first: {
+    brand: "Run!",
     label: "第一次提醒",
     title: "现在出发还来得及",
     pill: "请立即决策",
@@ -16,6 +18,7 @@ const stageMeta = {
     theme: "warn",
   },
   failed: {
+    brand: "Run!",
     label: "原站方案已失效",
     title: "启动出行救急",
     pill: "赶上概率 < 20%",
@@ -24,6 +27,7 @@ const stageMeta = {
     theme: "danger",
   },
   action: {
+    brand: "Covered!",
     label: "已找到最小损失方案",
     title: "去石家庄接回原车",
     pill: "成功概率 78%",
@@ -41,6 +45,7 @@ const panels = {
 };
 
 const statusCard = document.querySelector("#statusCard");
+const brandTitle = document.querySelector("#brandTitle");
 const statusLabel = document.querySelector("#statusLabel");
 const statusTitle = document.querySelector("#statusTitle");
 const statusPill = document.querySelector("#statusPill");
@@ -63,6 +68,7 @@ function setStage(stage) {
   });
 
   statusLabel.textContent = meta.label;
+  brandTitle.textContent = meta.brand;
   statusTitle.textContent = meta.title;
   statusPill.textContent = meta.pill;
   etaText.textContent = meta.eta;
