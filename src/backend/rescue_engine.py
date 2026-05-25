@@ -114,6 +114,15 @@ class RescueEngine:
         if original_service is None:
             return {"status": "not_found", "candidates": [], "filter_reasons": ["找不到原车车次"]}
 
+        original_origin_stop = self.schedule.get_stop(
+            order.train_no,
+            order.origin_station,
+            order.origin_station,
+        )
+        original_origin_departure = (
+            original_origin_stop.departure_abs_min if original_origin_stop is not None else None
+        )
+
         reachable_hubs = self._reachable_hubs(
             order.current_location,
             now_abs,
@@ -169,6 +178,22 @@ class RescueEngine:
                     )
                     continue
                 for connection in connections:
+                    if (
+                        original_origin_departure is not None
+                        and connection.depart_abs_min < original_origin_departure
+                    ):
+                        filter_reasons.append(
+                            {
+                                "train_no": connection.train_no,
+                                "hub": hub,
+                                "station": stop.station,
+                                "reason": "forbidden_earlier_rescue_train",
+                                "detail": "严禁使用更早发的车次去追更晚发的目标车次",
+                                "rescue_departure": format_abs_min(connection.depart_abs_min),
+                                "target_origin_departure": format_abs_min(original_origin_departure),
+                            }
+                        )
+                        continue
                     inventory = DEMO_INVENTORY.get(
                         connection.train_no,
                         {"status": "unknown", "price_cny": None, "risk": "余票未知，Demo 中降权"},
@@ -322,6 +347,21 @@ class RescueEngine:
             extra_eta_min=extra_eta_min,
             extra_station_buffer_min=extra_station_buffer_min,
         )
+        if second.get("can_catch"):
+            rescue = {
+                "status": "not_needed",
+                "order": order.__dict__,
+                "now": order.second_reminder_time,
+                "candidates": [],
+                "filter_reasons": [
+                    {
+                        "reason": "target_train_still_catchable",
+                        "detail": "如果现在的目标车次不用追，那么就不用追",
+                    }
+                ],
+                "recommendation": None,
+            }
+            return {"first_reminder": first, "second_reminder": second, "rescue_search": rescue}
         rescue = self.find_intercept_candidates(
             order,
             order.second_reminder_time,

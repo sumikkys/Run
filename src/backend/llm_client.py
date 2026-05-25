@@ -5,7 +5,22 @@ import os
 import re
 import urllib.error
 import urllib.request
+from pathlib import Path
 from typing import Any
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_CARD_JSON = REPO_ROOT / "card.json"
+
+
+ACTION_CARD_FIELDS = {
+    "行动简述": [],
+    "花费": [],
+    "出发时间": [],
+    "预计到达地": [],
+    "预计到达时间": [],
+    "原因/说明": [],
+}
 
 
 class DeepSeekClient:
@@ -17,7 +32,7 @@ class DeepSeekClient:
         timeout: int = 12,
     ) -> None:
         self.api_key = api_key or os.environ.get("DEEPSEEK_API_KEY") or ""
-        self.model = model or os.environ.get("DEEPSEEK_MODEL") or "deepseek-v4-pro"
+        self.model = model or os.environ.get("DEEPSEEK_MODEL") or "deepseek-chat"
         self.base_url = base_url or os.environ.get("DEEPSEEK_BASE_URL") or "https://api.deepseek.com/chat/completions"
         self.timeout = timeout
 
@@ -41,7 +56,7 @@ class DeepSeekClient:
             "model": model,
             "messages": messages,
             "temperature": 0.2,
-            "max_tokens": 650,
+            "max_tokens": 900,
         }
         request = urllib.request.Request(
             self.base_url,
@@ -76,21 +91,21 @@ def generate_transfer_advice(
     prompt = {
         "manual_transfer": transfer_entry,
         "candidate_plan": candidate,
-        "task": "基于人工标注经验帖，输出给赶车用户看的极简换乘建议。不要重新计算可行性，不要编造时刻，只解释该怎么走和风险点。",
+        "task": (
+            "基于人工标注经验，输出给赶车用户看的极简换乘建议。"
+            "不要重新计算可行性，不要编造时刻，只解释该怎么走和风险点。"
+        ),
     }
     try:
         text = client.chat(
             [
                 {
                     "role": "system",
-                    "content": "你是 Run! 出行救急插件的行动卡文案助手。规则引擎已经完成严肃判断，你只负责把人工经验整理为可执行中文提示。",
+                    "content": "你是 Run! 出行救急插件的行动卡文案助手。规则引擎已经完成判断，你只负责把人工经验整理为可执行中文提示。",
                 },
                 {"role": "user", "content": json.dumps(prompt, ensure_ascii=False)},
             ]
         )
-        validation_error = validate_action_card_text(text, compact_result)
-        if validation_error:
-            raise RuntimeError(f"llm_output_failed_validation: {validation_error}")
         return {"source": "deepseek", "text": text}
     except Exception as exc:
         advice = str(transfer_entry.get("advice", "")).strip()
@@ -109,39 +124,132 @@ def generate_action_card(
     compact_result = compact_action_card_payload(rule_engine_result)
     prompt = {
         "verified_result": compact_result,
-        "task": (
-            "请生成 Run! 误车救急行动卡。只能总结规则引擎已经验证过的方案，"
-            "不要编造车次、票价、时刻或余票，也不要从候选方案中重新选择。"
-            "输出包括：一句话结论、现在立刻做什么、为什么不去原站、换乘/失败阈值、风险提示。"
-            "中文，短句，适合手机卡片。"
-        ),
+        "required_output": ACTION_CARD_FIELDS,
+        "field_rules": {
+            "行动简述": "数组。每一项是一条可执行动作，例如购票、前往车站、乘车、换乘。",
+            "花费": "数组。每一项对应同下标动作的花费；没有可靠数据写'未知'，不要编造。",
+            "出发时间": "数组。每一项对应同下标动作的开始/出发时间；没有可靠数据写'未知'。",
+            "预计到达地": "数组。每一项对应同下标动作预计到达的地点。",
+            "预计到达时间": "数组。每一项对应同下标动作预计到达时间；没有可靠数据写'未知'。",
+            "原因/说明": "数组。每一项解释对应动作的依据、风险、余票、换乘余量或失败阈值。",
+        },
+        "hard_constraints": [
+            "只能使用 verified_result 中已有的信息。",
+            "不要编造车次、票价、时刻、地点、余票状态。",
+            "不要重新选择方案，只能总结规则引擎的 recommendation。",
+            "所有字段都必须存在，且都必须是数组。",
+            "所有数组长度必须一致，同一个下标代表同一个执行步骤。",
+            "没有可靠数据时填字符串'未知'。",
+            "输出必须且只能是一个 Markdown 代码块，代码块语言为 json。",
+            "代码块外不要输出任何解释。",
+        ],
+        "expected_shape": "```json\n{\"行动简述\": [], \"花费\": [], \"出发时间\": [], \"预计到达地\": [], \"预计到达时间\": [], \"原因/说明\": []}\n```",
     }
     try:
         text = client.chat(
             [
                 {
                     "role": "system",
-                    "content": "你是 Run! 出行救急插件的行动卡助手。规则引擎负责计算，你负责把结果压缩成可执行行动卡。",
+                    "content": (
+                        "你是 Run! 出行救急插件的结构化输出助手。"
+                        "规则引擎负责计算，你只把已验证结果整理为前端可解析的 JSON。"
+                        "必须返回被 ```json 和 ``` 包裹的 JSON 对象。"
+                    ),
                 },
                 {"role": "user", "content": json.dumps(prompt, ensure_ascii=False)},
             ]
         )
+        text = normalize_action_card_codeblock(text)
+        save_action_card_json(text)
         return {"source": "deepseek", "text": text}
     except Exception as exc:
-        rescue = rule_engine_result.get("rescue_search", {})
-        recommendation = rescue.get("recommendation") if isinstance(rescue, dict) else None
-        if isinstance(recommendation, dict):
-            train = recommendation["rescue_train"]
-            rejoin = recommendation["original_train_rejoin"]
-            text = (
-                f"结论：原站已赶不上，优先买 {train['train_no']} 从{train['from_station']}去{train['to_station']}，"
-                f"{train['arrival_time']} 到达后在{rejoin['station']}接回原车 {rejoin['train_no']}。"
-                f"接回原车开车时间 {rejoin['departure_time']}，当前换乘余量约 {recommendation['transfer_margin_min']} 分钟。"
-                "若 ETA 再增加或余票消失，立即切换 Plan B。"
-            )
-        else:
-            text = "结论：暂未找到可验证追车方案，建议进入改签、退票重买或航班兜底。"
+        text = build_template_action_card_codeblock(rule_engine_result)
+        save_action_card_json(text)
         return {"source": "template_fallback", "text": text, "error": str(exc)}
+
+
+def normalize_action_card_codeblock(text: str) -> str:
+    stripped = text.strip()
+    if stripped.startswith("```"):
+        return stripped
+    parsed = extract_json_object(stripped)
+    if parsed is None:
+        return stripped
+    return "```json\n" + json.dumps(parsed, ensure_ascii=False, indent=2) + "\n```"
+
+
+def extract_json_object(text: str) -> dict[str, object] | None:
+    codeblock = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, flags=re.S | re.I)
+    if codeblock:
+        text = codeblock.group(1)
+    try:
+        value = json.loads(text)
+        return value if isinstance(value, dict) else None
+    except json.JSONDecodeError:
+        pass
+    match = re.search(r"\{.*\}", text, flags=re.S)
+    if not match:
+        return None
+    try:
+        value = json.loads(match.group(0))
+    except json.JSONDecodeError:
+        return None
+    return value if isinstance(value, dict) else None
+
+
+def save_action_card_json(text: str, path: str | Path = DEFAULT_CARD_JSON) -> None:
+    payload = extract_json_object(text)
+    if payload is None:
+        raise ValueError("action card text does not contain a JSON object")
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w", encoding="utf-8") as file:
+        json.dump(payload, file, ensure_ascii=False, indent=2)
+
+
+def build_template_action_card_codeblock(rule_engine_result: dict[str, object]) -> str:
+    rescue = rule_engine_result.get("rescue_search", {})
+    recommendation = rescue.get("recommendation") if isinstance(rescue, dict) else None
+    if isinstance(recommendation, dict):
+        train = recommendation["rescue_train"]
+        rejoin = recommendation["original_train_rejoin"]
+        inventory = recommendation.get("inventory") or {}
+        payload = {
+            "行动简述": [
+                f"购买并乘坐 {train.get('train_no', '未知')}",
+                f"到达后在{rejoin.get('station', '未知')}接回原车 {rejoin.get('train_no', '未知')}",
+            ],
+            "花费": [
+                f"{inventory.get('price_cny')}元" if inventory.get("price_cny") is not None else "未知",
+                "0元",
+            ],
+            "出发时间": [
+                str(train.get("departure_time") or "未知"),
+                str(rejoin.get("departure_time") or "未知"),
+            ],
+            "预计到达地": [
+                str(train.get("to_station") or "未知"),
+                str(rejoin.get("destination_station") or "未知"),
+            ],
+            "预计到达时间": [
+                str(train.get("arrival_time") or "未知"),
+                "未知",
+            ],
+            "原因/说明": [
+                f"补救车余票状态：{inventory.get('status', '未知')}；风险：{inventory.get('risk', '未知')}",
+                f"换乘余量约 {recommendation.get('transfer_margin_min', '未知')} 分钟；若 ETA 增加或余票消失，切换 Plan B",
+            ],
+        }
+    else:
+        payload = {
+            "行动简述": ["进入改签、退票重买或航班兜底"],
+            "花费": ["未知"],
+            "出发时间": ["未知"],
+            "预计到达地": ["未知"],
+            "预计到达时间": ["未知"],
+            "原因/说明": ["规则引擎暂未找到可验证追车方案"],
+        }
+    return "```json\n" + json.dumps(payload, ensure_ascii=False, indent=2) + "\n```"
 
 
 def compact_action_card_payload(rule_engine_result: dict[str, object]) -> dict[str, object]:
