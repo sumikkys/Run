@@ -9,186 +9,245 @@
   <body>
     <div class="demo-stage">
       <main class="phone-shell" aria-label="Run 出行救急移动端概念页">
-        <section class="hero">
-          <div class="topbar">
-            <div>
-              <p class="eyebrow">OTA 订单救急插件</p>
-              <h1 id="brandTitle">OK!</h1>
+        <div class="app-screen">
+          <header class="status-bar" aria-label="手机状态栏">
+            <strong>9:41</strong>
+            <div class="system-icons" aria-hidden="true">
+              <span class="signal"></span>
+              <span class="wifi"></span>
+              <span class="battery"></span>
             </div>
-            <button class="icon-button" type="button" aria-label="打开实验室" data-open-lab>
-              <span aria-hidden="true">LAB</span>
-            </button>
-          </div>
+          </header>
 
-          <div class="status-card" id="statusCard">
+          <section class="app-header">
             <div>
+              <h1 id="brandTitle">OK!</h1>
+              <p>出行救急插件</p>
+            </div>
+            <button class="order-pill" type="button" aria-label="查看订单">
+              <span class="order-icon" aria-hidden="true"></span>
+              订单
+            </button>
+          </section>
+
+          <section class="emergency-card status-card" id="statusCard">
+            <div class="hero-copy">
               <p class="status-label" id="statusLabel">当前可正常赶上</p>
               <strong id="statusTitle">建议 17:05 前出发</strong>
+              <span class="status-pill" id="statusPill">安全余量 18 分钟</span>
+              <button class="hero-action" type="button" data-stage-button="first">
+                查看救急方案
+                <span aria-hidden="true"></span>
+              </button>
             </div>
-            <span class="status-pill" id="statusPill">安全余量 18 分钟</span>
-          </div>
-
-          <div class="route-strip" aria-label="原订单路线">
-            <div class="route-node active">
-              <span></span>
-              中关村学院
-            </div>
-            <div class="route-line"></div>
-            <div class="route-node">
-              <span></span>
-              北京西
-            </div>
-            <div class="route-line"></div>
-            <div class="route-node">
-              <span></span>
-              西安北
-            </div>
-          </div>
-        </section>
-
-        <section class="content">
-          <article class="order-card">
-            <div class="section-title">
-              <p>已购订单</p>
-              <span>12306 / OTA 导入</span>
-            </div>
-            <div class="train-row">
-              <div>
-                <strong>G673</strong>
-                <p>北京西 18:06 → 西安北 23:11</p>
-              </div>
-              <span>二等座</span>
-            </div>
-            <div class="metrics">
-              <div>
-                <small>当前位置</small>
-                <strong>中关村学院</strong>
-              </div>
-              <div>
-                <small>到站 ETA</small>
-                <strong id="etaText">43 分钟</strong>
-              </div>
-              <div>
-                <small>进站缓冲</small>
-                <strong id="bufferText">15 分钟</strong>
+            <div class="runner-art" aria-hidden="true">
+              <div class="train-shadow"></div>
+              <div class="speed-lines"></div>
+              <div class="runner">
+                <span class="runner-head"></span>
+                <span class="runner-body"></span>
+                <span class="runner-pack"></span>
+                <span class="runner-arm"></span>
+                <span class="runner-phone">R!</span>
+                <span class="runner-leg one"></span>
+                <span class="runner-leg two"></span>
               </div>
             </div>
-          </article>
-
-          <section class="panel active" id="safePanel">
-            <div class="notice good">
-              <p>Run! 监测到当前仍可赶上原车。</p>
-              <strong>现在出发，预计 17:48 抵达北京西，留有 18 分钟安全余量。</strong>
-            </div>
-            <button class="primary-action" type="button" data-stage-button="first">
-              模拟第一次提醒
-            </button>
           </section>
 
-          <section class="panel" id="firstPanel">
-            <div class="modal-card">
-              <p class="eyebrow">第一次提醒</p>
-              <h2>现在走，还来得及</h2>
-              <div class="decision-grid">
-                <div>
-                  <small>路上 ETA</small>
-                  <strong>43 分钟</strong>
-                </div>
-                <div>
-                  <small>安检进站</small>
-                  <strong>15 分钟</strong>
-                </div>
-                <div>
-                  <small>安全余量</small>
-                  <strong>18 分钟</strong>
-                </div>
+          <section class="ticket-card" aria-label="原订单信息">
+            <div class="station-block">
+              <strong>10:20</strong>
+              <p>北京西</p>
+              <span>始发站</span>
+            </div>
+            <div class="train-mid">
+              <strong>G673</strong>
+              <span>06-01 周六</span>
+              <div class="rail-line">
+                <i></i>
               </div>
-              <div class="button-stack">
-                <button class="primary-action" type="button">立即出发</button>
-                <button class="secondary-action" type="button">稍后提醒</button>
-                <button class="secondary-action danger-text" type="button" data-stage-button="failed">
-                  忽略 35 分钟
+            </div>
+            <div class="station-block right">
+              <strong>23:58</strong>
+              <p>西安北</p>
+              <span>终点站</span>
+            </div>
+          </section>
+
+          <section class="content">
+            <section class="panel active" id="safePanel">
+              <article class="plan-card calm">
+                <div class="plan-heading">
+                  <h2>当前方案</h2>
+                  <span>可正常赶上</span>
+                </div>
+                <div class="quick-grid">
+                  <div>
+                    <small>当前位置</small>
+                    <strong>中关村学院</strong>
+                    <p>距北京西 32km</p>
+                  </div>
+                  <div>
+                    <small>到站 ETA</small>
+                    <strong id="etaText">43 分钟</strong>
+                    <p>含路上拥堵</p>
+                  </div>
+                  <div>
+                    <small>进站缓冲</small>
+                    <strong id="bufferText">15 分钟</strong>
+                    <p>含安检排队</p>
+                  </div>
+                </div>
+                <button class="primary-action" type="button" data-stage-button="first">
+                  模拟第一次提醒
                 </button>
-              </div>
-            </div>
-          </section>
+              </article>
+            </section>
 
-          <section class="panel" id="failedPanel">
-            <div class="notice danger">
-              <p>原站方案已失效</p>
-              <strong>继续去北京西的赶上概率低于 20%，不建议再无效冲刺。</strong>
-            </div>
-            <div class="search-box">
-              <div class="scan-line"></div>
-              <p>正在搜索下游站拦截、补救高铁、改签与航空兜底方案</p>
-              <div class="search-stats">
-                <span>候选 27</span>
-                <span>过滤 23</span>
-                <span>保留 4</span>
-              </div>
-            </div>
-            <ul class="filter-list">
-              <li><span></span>8 条无余票</li>
-              <li><span></span>6 条赶不上发车站</li>
-              <li><span></span>5 条到达晚于原车</li>
-              <li><span></span>4 条异站换乘不足</li>
-            </ul>
-            <button class="primary-action" type="button" data-stage-button="action">
-              查看最小损失方案
-            </button>
-          </section>
+            <section class="panel" id="firstPanel">
+              <article class="plan-card warning">
+                <div class="plan-heading">
+                  <h2>第一次提醒</h2>
+                  <span>危险边缘</span>
+                </div>
+                <div class="risk-copy">
+                  <strong>现在走，还可能赶上。</strong>
+                  <p>路上 ETA 43 分钟，进站缓冲 15 分钟，剩余安全余量正在快速变薄。</p>
+                </div>
+                <div class="button-stack">
+                  <button class="primary-action" type="button">立即出发</button>
+                  <button class="secondary-action" type="button">稍后提醒</button>
+                  <button class="secondary-action danger-text" type="button" data-stage-button="failed">
+                    忽略 35 分钟
+                  </button>
+                </div>
+              </article>
+            </section>
 
-          <section class="panel" id="actionPanel">
-            <article class="action-card">
-              <div class="section-title">
-                <p>推荐方案</p>
-                <span>下游站拦截原车</span>
+            <section class="panel" id="failedPanel">
+              <article class="plan-card danger">
+                <div class="plan-heading">
+                  <h2>救急搜索</h2>
+                  <span>原站已失效</span>
+                </div>
+                <div class="search-box">
+                  <div class="scan-line"></div>
+                  <p>正在搜索下游站拦截、补救高铁、改签与航空兜底方案</p>
+                  <div class="search-stats">
+                    <span>候选 27</span>
+                    <span>过滤 23</span>
+                    <span>保留 4</span>
+                  </div>
+                </div>
+                <ul class="filter-list">
+                  <li><span></span>8 条无余票</li>
+                  <li><span></span>6 条赶不上发车站</li>
+                  <li><span></span>5 条到达晚于原车</li>
+                  <li><span></span>4 条异站换乘不足</li>
+                </ul>
+                <button class="primary-action" type="button" data-stage-button="action">
+                  查看最小损失方案
+                </button>
+              </article>
+            </section>
+
+            <section class="panel" id="actionPanel">
+              <article class="plan-card featured">
+                <div class="plan-heading">
+                  <h2>推荐方案 <span>1</span></h2>
+                  <em>最小损失</em>
+                  <p>预计可保住原票 <strong>87%</strong> 价值</p>
+                </div>
+                <div class="rescue-timeline">
+                  <div class="timeline-rail" aria-hidden="true"></div>
+                  <div class="step current">
+                    <time>现在</time>
+                    <span></span>
+                    <div>
+                      <strong>我的位置</strong>
+                      <p>距北京西 32km</p>
+                    </div>
+                    <b>12 分钟</b>
+                  </div>
+                  <div class="step">
+                    <time>11:05</time>
+                    <span></span>
+                    <div>
+                      <strong>北京丰台站</strong>
+                      <p>打车约 38 分钟</p>
+                    </div>
+                    <button type="button">去这里</button>
+                  </div>
+                  <div class="step train">
+                    <time>11:25</time>
+                    <span></span>
+                    <div>
+                      <strong>高铁 G7812</strong>
+                      <p>北京丰台 → 石家庄</p>
+                    </div>
+                    <b>¥129 有票</b>
+                  </div>
+                  <div class="step success">
+                    <time>12:04</time>
+                    <span></span>
+                    <div>
+                      <strong>石家庄站</strong>
+                      <p>换乘 6 分钟</p>
+                    </div>
+                    <b>步行 6 分钟</b>
+                  </div>
+                  <div class="step fail">
+                    <time>12:10</time>
+                    <span></span>
+                    <div>
+                      <strong>上车 G673</strong>
+                      <p>石家庄站，原车经停</p>
+                    </div>
+                    <b>可上车</b>
+                  </div>
+                </div>
+                <div class="plan-footer">
+                  <p>总耗时 <strong>1 小时 44 分</strong></p>
+                  <p>总花费 <strong>¥129</strong></p>
+                  <button class="primary-action" type="button">去执行方案</button>
+                </div>
+              </article>
+
+              <article class="backup-card">
+                <div>
+                  <h2>备选方案 <span>2</span></h2>
+                  <p>现在 → 保定东 → 上车 G673</p>
+                </div>
+                <strong>62%</strong>
+              </article>
+            </section>
+
+            <section class="threshold-card">
+              <div>
+                <strong>失败阈值</strong>
+                <p>12:08 之前未到达石家庄站，可能无法赶上原车</p>
               </div>
-              <h2>别去北京西，先去石家庄</h2>
-              <p class="action-copy">
-                立即购买 G7812 北京丰台 → 石家庄，20:06 到达后站内换乘，接回原 G673。
-              </p>
-              <div class="timeline">
-                <div>
-                  <span>17:42</span>
-                  <p>叫车去北京丰台</p>
-                </div>
-                <div>
-                  <span>18:36</span>
-                  <p>乘 G7812 到石家庄</p>
-                </div>
-                <div>
-                  <span>20:24</span>
-                  <p>接回原车 G673</p>
-                </div>
-              </div>
-              <div class="metrics compact">
-                <div>
-                  <small>新增成本</small>
-                  <strong>¥128</strong>
-                </div>
-                <div>
-                  <small>保住原票</small>
-                  <strong>¥515</strong>
-                </div>
-                <div>
-                  <small>成功概率</small>
-                  <strong>78%</strong>
-                </div>
-              </div>
-              <div class="threshold">
-                <span>失败阈值</span>
-                <p>18:03 前未上车，自动重算 Plan B。</p>
-              </div>
-              <div class="button-grid">
-                <button class="primary-action" type="button">一键购票 Mock</button>
-                <button class="secondary-action" type="button">一键叫车 Mock</button>
-                <button class="secondary-action" type="button">复制给同行人</button>
-                <button class="secondary-action" type="button">查看 Plan B</button>
-              </div>
-            </article>
+              <span>还有 <b>52</b> 分钟</span>
+              <i aria-hidden="true"></i>
+            </section>
           </section>
-        </section>
+        </div>
+
+        <nav class="bottom-nav" aria-label="底部导航">
+          <button class="active" type="button">
+            <span aria-hidden="true"></span>
+            救急
+          </button>
+          <button type="button">
+            <span aria-hidden="true"></span>
+            行程
+          </button>
+          <button type="button">
+            <span aria-hidden="true"></span>
+            我的
+          </button>
+        </nav>
 
         <aside class="lab-drawer" id="labDrawer" aria-hidden="true">
           <div class="drawer-panel">

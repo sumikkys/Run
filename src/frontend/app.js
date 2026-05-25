@@ -3,7 +3,7 @@ const stageMeta = {
     brand: "OK!",
     label: "当前可正常赶上",
     title: "建议 17:05 前出发",
-    pill: "安全余量 18 分钟",
+    pill: "按当前情况计算，你将提前 18 分钟",
     eta: "43 分钟",
     buffer: "15 分钟",
     theme: "safe",
@@ -11,8 +11,8 @@ const stageMeta = {
   first: {
     brand: "Run!",
     label: "第一次提醒",
-    title: "现在出发还来得及",
-    pill: "请立即决策",
+    title: "可能赶不上原车",
+    pill: "按当前情况计算，你可能只剩 6 分钟",
     eta: "43 分钟",
     buffer: "15 分钟",
     theme: "warn",
@@ -20,8 +20,8 @@ const stageMeta = {
   failed: {
     brand: "Run!",
     label: "原站方案已失效",
-    title: "启动出行救急",
-    pill: "赶上概率 < 20%",
+    title: "可能赶不上原车",
+    pill: "按当前情况计算，你将晚到 23 分钟",
     eta: "78 分钟",
     buffer: "15 分钟",
     theme: "danger",
@@ -30,7 +30,7 @@ const stageMeta = {
     brand: "Covered!",
     label: "已找到最小损失方案",
     title: "去石家庄接回原车",
-    pill: "成功概率 78%",
+    pill: "预计可保住原票 87% 价值",
     eta: "54 分钟",
     buffer: "12 分钟",
     theme: "action",
@@ -85,22 +85,31 @@ document.querySelectorAll("[data-stage-button]").forEach((button) => {
   button.addEventListener("click", () => setStage(button.dataset.stageButton));
 });
 
-document.querySelector("[data-open-lab]").addEventListener("click", () => {
-  labDrawer.classList.add("open");
-  labDrawer.setAttribute("aria-hidden", "false");
-});
+const openLabButton = document.querySelector("[data-open-lab]");
+const closeLabButton = document.querySelector("[data-close-lab]");
 
-document.querySelector("[data-close-lab]").addEventListener("click", () => {
-  labDrawer.classList.remove("open");
-  labDrawer.setAttribute("aria-hidden", "true");
-});
+if (openLabButton && labDrawer) {
+  openLabButton.addEventListener("click", () => {
+    labDrawer.classList.add("open");
+    labDrawer.setAttribute("aria-hidden", "false");
+  });
+}
 
-labDrawer.addEventListener("click", (event) => {
-  if (event.target === labDrawer) {
+if (closeLabButton && labDrawer) {
+  closeLabButton.addEventListener("click", () => {
     labDrawer.classList.remove("open");
     labDrawer.setAttribute("aria-hidden", "true");
-  }
-});
+  });
+}
+
+if (labDrawer) {
+  labDrawer.addEventListener("click", (event) => {
+    if (event.target === labDrawer) {
+      labDrawer.classList.remove("open");
+      labDrawer.setAttribute("aria-hidden", "true");
+    }
+  });
+}
 
 const consoleMessages = {
   eta: "打车 ETA 增加 8 分钟，原推荐保留，但失败阈值提前到 17:55。",
