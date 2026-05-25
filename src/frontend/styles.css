@@ -491,9 +491,11 @@ h2 {
 }
 
 .search-box p {
+  color: #7cffb0;
   font-size: 15px;
   font-weight: 800;
   line-height: 1.4;
+  text-shadow: 0 1px 14px rgba(124, 255, 176, 0.34);
 }
 
 .search-stats {
