@@ -6,6 +6,7 @@ import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
+from .env_loader import load_dotenv
 from .llm_client import generate_action_card, generate_transfer_advice
 from .rescue_engine import DEFAULT_ORDER, RescueEngine, RescueOrder
 
@@ -223,6 +224,7 @@ class DemoHandler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
+    load_dotenv()
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser()

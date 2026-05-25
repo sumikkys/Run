@@ -4,6 +4,7 @@ import argparse
 import json
 import sys
 
+from .env_loader import load_dotenv
 from .llm_client import generate_action_card, generate_transfer_advice
 from .rescue_engine import DEFAULT_ORDER, RescueEngine, RescueOrder, to_pretty_json
 
@@ -26,6 +27,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main() -> None:
+    load_dotenv()
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     args = build_parser().parse_args()
